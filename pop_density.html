@@ -68,25 +68,7 @@ p {
 .mapboxgl-canvas-container.mapboxgl-interactive,
 .mapboxgl-ctrl-group button.mapboxgl-ctrl-compass {
     cursor: unset;
-    
 }
-mapboxgl.accessToken = 'pk.eyJ1IjoiamFrb2J6aGFvIiwiYSI6ImNpcms2YWsyMzAwMmtmbG5icTFxZ3ZkdncifQ.P9MBej1xacybKcDN_jehvw';
-
-const map = new mapboxgl.Map({
-        container: 'map', // container ID
-        style: 'mapbox://styles/mapbox/light-v10', // style URL
-        zoom: 3, // starting zoom
-        center: [-100, 40] // starting center
-    }
-);
-async function geojsonFetch() { 
-    // other operations
-    let response = await fetch('assets/stateData.geojson');
-let stateData = await response.json();
-}
-
-geojsonFetch();
-
     </style>
 </head> 
 
@@ -100,8 +82,71 @@ geojsonFetch();
     </div>
     <div class='map-overlay' id='legend'></div>
     <script>
-    </script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiamFrb2J6aGFvIiwiYSI6ImNpcms2YWsyMzAwMmtmbG5icTFxZ3ZkdncifQ.P9MBej1xacybKcDN_jehvw';
 
-</body>
+const map = new mapboxgl.Map({
+        container: 'map', // container ID
+        style: 'mapbox://styles/mapbox/light-v10', // style URL
+        zoom: 3, // starting zoom
+        center: [-100, 40] // starting center
+    }
+);
+async function geojsonFetch() { 
+    // other operations
+    let response = await fetch('assets/stateData.geojson');
+let stateData = await response.json();
+map.on('load', function loadingData() {
+    // add layer
+    // add legend
+    map.addSource('stateData', {
+    type: 'geojson',
+    data: stateData
+});
 
-</html>
+map.addLayer({
+    'id': 'stateData-layer',
+    'type': 'fill',
+    'source': 'stateData',
+    'paint': {
+        'fill-color': ["step",
+  input: number,
+  stop_output_0: OutputType, stop_input_0: number,
+  stop_output_1: OutputType, stop_input_1: number,
+  ...
+  stop_output_n: OutputType, stop_input_n: number, 
+  stop_output_n+1: OutputType
+]: OutputType
+        'fill-outline-color': '#BBBBBB',
+        'fill-opacity': 0.7,
+    }
+    const layers = [
+    '0-9',
+    '10-19',
+    '20-49',
+    '50-99',
+    '100-199',
+    '200-499',
+    '500-999',
+    '1000 and more'
+];
+const colors = [
+    '#FFEDA070',
+    '#FED97670',
+    '#FEB24C70',
+    '#FD8D3C70',
+    '#FC4E2A70',
+    '#E31A1C70',
+    '#BD002670',
+    '#80002670'
+];
+});
+const legend = document.getElementById('legend');
+legend.innerHTML = "<b>Population Density<br>(people/sq.mi.)</b><br><br>";
+
+layers.forEach((layer, i) => {
+    const color = colors[i];
+    const item = document.createElement('div');
+    const key = document.createElement('span');
+    key.className = 'legend-key';
+
+    

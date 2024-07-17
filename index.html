@@ -1,1 +1,153 @@
+<!DOCTYPE html>
+<html>
 
+<head>
+    <meta charset="utf-8">
+    <title>Interactive Web Mapping</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.5.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.5.0/mapbox-gl.js"></script>
+    <style>
+        h2, h3 {
+    margin: 10px;
+    font-size: 18px;
+}
+
+h3 {
+    font-size: 16px;
+}
+
+p {
+    margin: 10px;
+}
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+}
+.map-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.8);
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgba(0, 0, 0, 0.2);
+    margin-left: 20px;
+    font-family: Arial, sans-serif;
+    overflow: auto;
+    border-radius: 3px;
+}
+
+#features {
+    top: 0;
+    height: 100px;
+    margin-top: 20px;
+    width: 250px;
+}
+
+#legend {
+    padding: 10px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    line-height: 18px;
+    height: 210px;
+    margin-bottom: 40px;
+    width: 150px;
+}
+
+.legend-key {
+    display: inline-block;
+    border-radius: 20%;
+    width: 10px;
+    height: 10px;
+    margin-right: 5px;
+}
+.mapboxgl-canvas-container.mapboxgl-interactive,
+.mapboxgl-ctrl-group button.mapboxgl-ctrl-compass {
+    cursor: unset;
+}
+    </style>
+</head> 
+
+<body>
+    <div id="map"></div>
+    <div class='map-overlay' id='features'>
+        <h2>WA Covid Cases</h2>
+        <div id='text-description'>
+            <p>Hover over a county!</p>
+        </div>
+    </div>
+    <div class='map-overlay' id='legend'></div>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiamFrb2J6aGFvIiwiYSI6ImNpcms2YWsyMzAwMmtmbG5icTFxZ3ZkdncifQ.P9MBej1xacybKcDN_jehvw';
+
+const map = new mapboxgl.Map({
+        container: 'map', // container ID
+        style: 'mapbox://styles/mapbox/light-v10', // style URL
+        zoom: 3, // starting zoom
+        center: [-100, 40] // starting center
+    }
+);
+async function geojsonFetch() { 
+    // other operations
+    let response = await fetch('<assets>
+    <wa-covid-data-102521></wa-covid-data-102521>.geojson');
+let wa-covid-data-102521 = await response.json();
+map.on('load', function loadingData() {
+    // add layer
+    // add legend
+    map.addSource('wa-covid-data-102521', {
+    type: 'geojson',
+    data: wa-covid-data-102521
+});
+
+map.addLayer({
+    'id': 'wa-covid-data-102521-layer',
+    'type': 'fill',
+    'source': 'wa-covid-data-102521',
+    'paint': {
+        'fill-color': ["step",
+  input: number,
+  stop_output_0: OutputType, stop_input_0: number,
+  stop_output_1: OutputType, stop_input_1: number,
+  ...
+  stop_output_n: OutputType, stop_input_n: number, 
+  stop_output_n+1: OutputType
+]: OutputType
+        'fill-outline-color': '#BBBBBB',
+        'fill-opacity': 0.7,
+    }
+    const layers = [
+    '0-9',
+    '10-19',
+    '20-49',
+    '50-99',
+    '100-199',
+    '200-499',
+    '500-999',
+    '1000 and more'
+];
+const colors = [
+    '#FFEDA070',
+    '#FED97670',
+    '#FEB24C70',
+    '#FD8D3C70',
+    '#FC4E2A70',
+    '#E31A1C70',
+    '#BD002670',
+    '#80002670'
+];
+});
+const legend = document.getElementById('legend');
+legend.innerHTML = "<b>Covid Cases<br>(people/sq.mi.)</b><br><br>";
+
+layers.forEach((layer, i) => {
+    const color = colors[i];
+    const item = document.createElement('div');
+    const key = document.createElement('span');
+    key.className = 'legend-key';
+
+    
